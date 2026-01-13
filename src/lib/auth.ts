@@ -25,18 +25,45 @@ export type Session = typeof auth.$Infer.Session;
 
 // Server-side auth helpers
 export async function getSession(request?: Request) {
-  let headers: Headers;
-  
   if (request) {
-    headers = request.headers as unknown as Headers;
+    // Convert Request headers to Headers object
+    const headers = new Headers();
+    request.headers.forEach((value, key) => {
+      headers.set(key, value);
+    });
+    
+    return await auth.api.getSession({
+      headers: headers,
+    });
   } else {
-    const { headers: nextHeaders } = await import('next/headers');
-    headers = nextHeaders() as unknown as Headers;
+    // Use Next.js headers() for server components
+    // ReadonlyHeaders needs to be converted to Headers for Better Auth
+    const { headers } = await import('next/headers');
+    const headersObj = await headers();
+    
+    // Convert ReadonlyHeaders to plain object first, then to Headers
+    // This avoids issues with ReadonlyHeaders methods
+    const headersPlain: Record<string, string> = {};
+    
+    // ReadonlyHeaders has keys() method
+    const keys = headersObj.keys();
+    for (const key of keys) {
+      const value = headersObj.get(key);
+      if (value !== null) {
+        headersPlain[key] = value;
+      }
+    }
+    
+    // Create Headers from plain object
+    const headersMap = new Headers();
+    Object.entries(headersPlain).forEach(([key, value]) => {
+      headersMap.set(key, value);
+    });
+    
+    return await auth.api.getSession({
+      headers: headersMap,
+    });
   }
-  
-  return await auth.api.getSession({
-    headers: headers,
-  });
 }
 
 export async function isAuthenticated(request?: Request): Promise<boolean> {
