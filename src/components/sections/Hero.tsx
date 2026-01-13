@@ -156,7 +156,7 @@ export default function Hero() {
 
             <a
               ref={buttonRef}
-              href="#keşfet"
+              href="/hakkimizda"
               className="inline-block border border-white text-white px-6 py-3 lg:px-8 lg:py-4 uppercase font-bold tracking-wider hover:bg-white hover:text-dark transition-none min-h-[44px] flex items-center justify-center"
               style={{ opacity: 0 }}
             >

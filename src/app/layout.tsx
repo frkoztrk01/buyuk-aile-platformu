@@ -15,8 +15,8 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "Neo-Brutalist Corporate",
-  description: "Bold design with uncompromising vision",
+  title: "Büyük Aile Platformu",
+  description: "Büyük Aile Platformu",
 };
 
 export default function RootLayout({
