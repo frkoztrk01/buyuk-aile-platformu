@@ -2,23 +2,46 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, run the development server:
+First, install dependencies:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
+```
+
+Then, set up your environment variables. Copy `.env.example` to `.env.local` and fill in your configuration:
+
+```bash
+cp .env.example .env.local
+```
+
+### Required Environment Variables
+
+- `DATABASE_URL`: PostgreSQL connection string
+- `AWS_REGION`: AWS region (e.g., `us-east-1`)
+- `AWS_ACCESS_KEY_ID`: Your AWS access key ID
+- `AWS_SECRET_ACCESS_KEY`: Your AWS secret access key
+- `AWS_S3_BUCKET_NAME`: Your S3 bucket name
+
+### AWS S3 Setup
+
+1. Create an S3 bucket in your AWS account
+2. Configure bucket permissions to allow public read access for uploaded files
+3. Set up IAM user with S3 upload permissions
+4. Add the credentials to your `.env.local` file
+
+Run the development server:
+
+```bash
 pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- File uploads to AWS S3 (PDFs and images)
+- Admin panel for content management
+- PostgreSQL database with Drizzle ORM
 
 ## Learn More
 
