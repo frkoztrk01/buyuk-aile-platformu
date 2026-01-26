@@ -1,16 +1,13 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Globe, Phone, ChevronDown, Shield } from 'lucide-react';
+import { Phone, ChevronDown, Shield } from 'lucide-react';
 import { gsap } from 'gsap';
 
 export default function TopBar() {
-  const [currentLang, setCurrentLang] = useState('TR');
   const [isSecurityOpen, setIsSecurityOpen] = useState(false);
   const securityDropdownRef = useRef<HTMLDivElement>(null);
   const securityButtonRef = useRef<HTMLButtonElement>(null);
-
-  const languages = ['TR', 'EN'];
 
   const securityOptions = [
     { label: 'Güvenlik Hattı', href: 'tel:+905551234567', phone: '+90 555 123 45 67' },
@@ -92,19 +89,6 @@ export default function TopBar() {
             )}
           </div>
 
-          {/* Language Switcher */}
-          <div className="h-full border-l border-solid border-white/20">
-            <button
-              className="h-full flex items-center px-4 hover:bg-white/10 transition-none"
-              onClick={() => {
-                const nextLang = languages.find(lang => lang !== currentLang) || 'TR';
-                setCurrentLang(nextLang);
-              }}
-            >
-              <Globe className="w-4 h-4 mr-2" />
-              <span className="font-semibold uppercase">{currentLang}</span>
-            </button>
-          </div>
         </div>
       </div>
     </div>

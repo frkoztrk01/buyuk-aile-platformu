@@ -1,13 +1,15 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useContext } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
+import { Menu, X, Facebook, Twitter, Instagram, Youtube, ChevronDown } from 'lucide-react';
 import { gsap } from 'gsap';
 import Image from 'next/image';
 import NavButton from '../ui/NavButton';
 import MegaMenu from '../ui/MegaMenu';
 import Link from 'next/link';
+import LanguageSelector from '@/components/LanguageSelector';
+import { GoogleTranslateContext, type TranslateLang } from '@/components/GoogleTranslateProvider';
 
 interface NavLink {
   label: string;
@@ -19,13 +21,21 @@ interface NavLink {
   }>;
 }
 
+const LANGS: { value: TranslateLang; label: string }[] = [
+  { value: "tr", label: "TR" },
+  { value: "en", label: "EN" },
+  { value: "ar", label: "AR" },
+];
+
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
+  const translateCtx = useContext(GoogleTranslateContext);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
   const [isMedyaMenuOpen, setIsMedyaMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileLangOpen, setIsMobileLangOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const mobileMenuItemsRef = useRef<(HTMLLIElement | null)[]>([]);
@@ -410,7 +420,7 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Social Media Icons - Far Right (Desktop Only) */}
+            {/* Social Media Icons & Language Selector - Far Right (Desktop Only) */}
             <div className="hidden lg:flex col-span-2 items-center justify-center h-full border-l border-white/20 gap-2 px-4">
               {[
                 { icon: Facebook, href: '#', label: 'Facebook' },
@@ -430,6 +440,9 @@ export default function Navbar() {
                   </a>
                 );
               })}
+              <div className="ml-2">
+                <LanguageSelector variant="navbar" />
+              </div>
             </div>
 
             {/* Mobile Menu Toggle Button */}
@@ -499,6 +512,44 @@ export default function Navbar() {
                   )}
                 </li>
               ))}
+              
+              {/* Mobile Language Selector */}
+              {translateCtx && (
+                <li className="px-5 py-4 border-t border-white/20">
+                  <div className="notranslate">
+                    <button
+                      onClick={() => setIsMobileLangOpen(!isMobileLangOpen)}
+                      className="w-full flex items-center justify-between py-3 px-4 text-white font-medium border border-white/20 rounded-xl hover:bg-white/10 transition-colors"
+                      translate="no"
+                    >
+                      <span className="text-sm uppercase">Dil: {LANGS.find((l) => l.value === translateCtx.currentLang)?.label ?? "TR"}</span>
+                      <ChevronDown size={16} className={`transition-transform ${isMobileLangOpen ? "rotate-180" : ""}`} />
+                    </button>
+                    {isMobileLangOpen && (
+                      <div className="mt-2 bg-white/10 border border-white/20 rounded-xl overflow-hidden">
+                        {LANGS.map(({ value, label }) => (
+                          <button
+                            key={value}
+                            type="button"
+                            translate="no"
+                            onClick={() => {
+                              translateCtx.changeLanguage(value);
+                              setIsMobileLangOpen(false);
+                            }}
+                            className={`w-full text-left px-4 py-3 text-sm transition-colors border-b border-white/10 last:border-b-0 ${
+                              translateCtx.currentLang === value
+                                ? "text-white font-medium bg-white/20"
+                                : "text-white/80 hover:bg-white/10"
+                            }`}
+                          >
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </li>
+              )}
             </ul>
           </div>
         </div>

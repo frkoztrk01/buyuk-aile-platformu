@@ -41,3 +41,60 @@ body {
 .animate-slide-in-right {
   animation: slide-in-right 0.3s ease-out;
 }
+
+/* Hide Google Translate widget and banner */
+#google_translate_element {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  width: 0 !important;
+  overflow: hidden !important;
+  position: absolute !important;
+  left: -9999px !important;
+}
+
+.goog-te-banner-frame,
+.goog-te-menu-frame,
+.goog-te-menu-value,
+.goog-te-menu-value span,
+.goog-te-menu-value *,
+.goog-te-banner-frame.skiptranslate,
+.skiptranslate,
+.goog-te-banner,
+.goog-te-banner-frame,
+.goog-te-menu-frame,
+.goog-te-menu,
+.goog-te-menu2,
+.goog-te-menu-value,
+.goog-te-menu-value span,
+.goog-te-menu-value *,
+iframe[title*="Google Translate"],
+iframe[name*="google_translate"],
+iframe[src*="translate.google.com"],
+div[id*="google_translate"],
+div[class*="goog-te"],
+span[class*="goog-te"],
+select[class*="goog-te"],
+select.goog-te-combo {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  width: 0 !important;
+  overflow: hidden !important;
+  position: absolute !important;
+  left: -9999px !important;
+  pointer-events: none !important;
+}
+
+/* Fix body positioning when Google Translate is active */
+body {
+  top: 0 !important;
+  position: static !important;
+}
+
+/* Remove top padding that Google Translate adds */
+body.top {
+  padding-top: 0 !important;
+}
