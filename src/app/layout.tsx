@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Montserrat } from "next/font/google";
 import "./globals.css";
+import { GoogleTranslateProvider } from "@/components/GoogleTranslateProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -25,11 +26,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="tr">
       <body
         className={`${inter.variable} ${montserrat.variable} antialiased`}
       >
-        {children}
+        <GoogleTranslateProvider>
+          {children}
+        </GoogleTranslateProvider>
       </body>
     </html>
   );
