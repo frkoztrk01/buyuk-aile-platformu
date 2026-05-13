@@ -5,23 +5,31 @@ import { useRouter } from 'next/navigation';
 import { Upload, X, Save, Loader2, Eye } from 'lucide-react';
 import { useToast } from './useToast';
 import type { News } from '@/lib/db/schema';
+import { slugifyNewsTitle } from '@/lib/slugify-news';
 
 interface AdminContentEditorProps {
   mode?: 'create' | 'edit';
   newsId?: string;
   initialData?: News;
+  /** Haber/Duyuru vs yalnızca Etkinlik kayıtları */
+  contentKind?: 'news' | 'event';
 }
 
 export default function AdminContentEditor({
   mode = 'create',
   newsId,
   initialData,
+  contentKind = 'news',
 }: AdminContentEditorProps) {
   const router = useRouter();
   const { showSuccess, showError, showInfo } = useToast();
+  const isEvent = contentKind === 'event';
+  const redirectAfterSave = isEvent ? '/admin/etkinlikler' : '/admin/haberler';
   const [title, setTitle] = useState(initialData?.title || '');
   const [content, setContent] = useState(initialData?.content || '');
-  const [category, setCategory] = useState(initialData?.category || '');
+  const [category, setCategory] = useState(
+    initialData?.category || (isEvent ? 'Etkinlik' : '')
+  );
   const [date, setDate] = useState(
     initialData?.date
       ? new Date(initialData.date).toISOString().split('T')[0]
@@ -36,6 +44,12 @@ export default function AdminContentEditor({
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    if (isEvent) {
+      setCategory('Etkinlik');
+    }
+  }, [isEvent]);
+
+  useEffect(() => {
     if (mode === 'edit' && newsId && !initialData) {
       fetchNews();
     }
@@ -46,20 +60,34 @@ export default function AdminContentEditor({
     
     try {
       setIsLoading(true);
-      const response = await fetch(`/api/admin/news/${newsId}`);
+      const response = await fetch(`/api/admin/news/${newsId}`, {
+        credentials: 'include',
+      });
       if (!response.ok) {
         throw new Error('Failed to fetch news');
       }
       const data = await response.json();
+      if (!isEvent && data.category === 'Etkinlik') {
+        showError('Bu içerik etkinlik olarak yönetilir.');
+        router.push(`/admin/etkinlikler/${newsId}/duzenle`);
+        return;
+      }
+      if (isEvent && data.category !== 'Etkinlik') {
+        showError('Bu içerik etkinlik kategorisinde değil.');
+        router.push('/admin/etkinlikler');
+        return;
+      }
       setTitle(data.title);
       setContent(data.content);
-      setCategory(data.category);
+      setCategory(isEvent ? 'Etkinlik' : data.category);
       setDate(new Date(data.date).toISOString().split('T')[0]);
       setIsPublished(data.isPublished);
       setUploadedImage(data.imageUrl || null);
     } catch (error) {
       console.error('Error fetching news:', error);
-      showError('Haber yüklenirken bir hata oluştu');
+      showError(
+        isEvent ? 'Etkinlik yüklenirken bir hata oluştu' : 'Haber yüklenirken bir hata oluştu'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -118,7 +146,8 @@ export default function AdminContentEditor({
       showError('İçerik gereklidir');
       return;
     }
-    if (!category) {
+    const effectiveCategory = isEvent ? 'Etkinlik' : category;
+    if (!effectiveCategory) {
       showError('Kategori gereklidir');
       return;
     }
@@ -130,15 +159,16 @@ export default function AdminContentEditor({
 
       const response = await fetch(url, {
         method,
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           title,
-          slug: title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+          slug: slugifyNewsTitle(title),
           content,
           imageUrl: uploadedImage,
-          category,
+          category: effectiveCategory,
           date,
           isPublished,
         }),
@@ -146,20 +176,36 @@ export default function AdminContentEditor({
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Failed to save news');
+        const fallback = isEvent
+          ? mode === 'create'
+            ? 'Etkinlik kaydedilemedi'
+            : 'Etkinlik güncellenemedi'
+          : mode === 'create'
+            ? 'Haber kaydedilemedi'
+            : 'Haber güncellenemedi';
+        throw new Error(error.error || fallback);
       }
 
-      const data = await response.json();
+      await response.json();
       showSuccess(
-        mode === 'create' ? 'Haber başarıyla oluşturuldu' : 'Haber başarıyla güncellendi'
+        isEvent
+          ? mode === 'create'
+            ? 'Etkinlik başarıyla oluşturuldu'
+            : 'Etkinlik başarıyla güncellendi'
+          : mode === 'create'
+            ? 'Haber başarıyla oluşturuldu'
+            : 'Haber başarıyla güncellendi'
       );
       
       setTimeout(() => {
-        router.push('/admin/haberler');
+        router.push(redirectAfterSave);
       }, 1000);
     } catch (error: any) {
       console.error('Error saving news:', error);
-      showError(error.message || 'Haber kaydedilirken bir hata oluştu');
+      showError(
+        error.message ||
+          (isEvent ? 'Etkinlik kaydedilirken bir hata oluştu' : 'Haber kaydedilirken bir hata oluştu')
+      );
     } finally {
       setIsSaving(false);
     }
@@ -176,7 +222,9 @@ export default function AdminContentEditor({
         <div className="flex items-center justify-center py-12">
           <div className="flex items-center gap-3">
             <Loader2 className="w-5 h-5 animate-spin text-[#1E3A5F]" />
-            <p className="text-sm text-gray-600 font-sans">Yükleniyor...</p>
+            <p className="text-sm text-gray-600 font-sans">
+              {isEvent ? 'Etkinlik yükleniyor...' : 'Yükleniyor...'}
+            </p>
           </div>
         </div>
       ) : (
@@ -185,10 +233,16 @@ export default function AdminContentEditor({
           <div className="flex items-center justify-between mb-8">
             <div>
               <h1 className="text-4xl font-black uppercase tracking-tighter text-[#1E3A5F] font-montserrat mb-2">
-                {mode === 'create' ? 'YENİ HABER' : 'HABER DÜZENLE'}
+                {isEvent
+                  ? mode === 'create'
+                    ? 'YENİ ETKİNLİK'
+                    : 'ETKİNLİK DÜZENLE'
+                  : mode === 'create'
+                    ? 'YENİ HABER'
+                    : 'HABER DÜZENLE'}
               </h1>
               <p className="text-sm uppercase tracking-widest text-gray-600 font-montserrat">
-                İÇERİK YÖNETİMİ
+                {isEvent ? 'ETKİNLİK YÖNETİMİ' : 'İÇERİK YÖNETİMİ'}
               </p>
             </div>
             <div className="flex gap-3">
@@ -229,27 +283,38 @@ export default function AdminContentEditor({
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           className="w-full text-4xl font-black uppercase tracking-tighter text-[#1E3A5F] font-montserrat bg-transparent border-b-2 border-black/20 focus:outline-none focus:border-[#1E3A5F] transition-none pb-4"
-          placeholder="HABER BAŞLIĞI"
+          placeholder={isEvent ? 'ETKİNLİK BAŞLIĞI' : 'HABER BAŞLIĞI'}
         />
       </div>
 
           {/* Category and Date Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white border border-black/10 p-6">
-              <label className="block text-xs uppercase tracking-widest text-[#1E3A5F] font-montserrat font-bold mb-4">
-                KATEGORİ
-              </label>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-4 py-3 border border-black/20 bg-white text-[#1E3A5F] font-sans focus:outline-none focus:border-[#1E3A5F] transition-none"
-              >
-                <option value="">Kategori Seçin</option>
-                <option value="Haber">Haber</option>
-                <option value="Duyuru">Duyuru</option>
-                <option value="Etkinlik">Etkinlik</option>
-              </select>
-            </div>
+            {!isEvent && (
+              <div className="bg-white border border-black/10 p-6">
+                <label className="block text-xs uppercase tracking-widest text-[#1E3A5F] font-montserrat font-bold mb-4">
+                  KATEGORİ
+                </label>
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full px-4 py-3 border border-black/20 bg-white text-[#1E3A5F] font-sans focus:outline-none focus:border-[#1E3A5F] transition-none"
+                >
+                  <option value="">Kategori Seçin</option>
+                  <option value="Haber">Haber</option>
+                  <option value="Duyuru">Duyuru</option>
+                </select>
+              </div>
+            )}
+            {isEvent && (
+              <div className="bg-white border border-black/10 p-6">
+                <label className="block text-xs uppercase tracking-widest text-[#1E3A5F] font-montserrat font-bold mb-4">
+                  KATEGORİ
+                </label>
+                <p className="w-full px-4 py-3 border border-black/20 bg-gray-50 text-[#1E3A5F] font-sans font-semibold">
+                  Etkinlik
+                </p>
+              </div>
+            )}
             <div className="bg-white border border-black/10 p-6">
               <label className="block text-xs uppercase tracking-widest text-[#1E3A5F] font-montserrat font-bold mb-4">
                 TARİH
@@ -334,7 +399,9 @@ export default function AdminContentEditor({
           value={content}
           onChange={(e) => setContent(e.target.value)}
           className="w-full min-h-[400px] px-4 py-3 border border-black/20 bg-white text-[#1E3A5F] font-sans text-base leading-relaxed focus:outline-none focus:border-[#1E3A5F] transition-none resize-none"
-          placeholder="Haber içeriğini buraya yazın..."
+          placeholder={
+            isEvent ? 'Etkinlik açıklamasını buraya yazın...' : 'Haber içeriğini buraya yazın...'
+          }
         />
           <p className="mt-2 text-xs text-gray-500 font-sans">
             Not: Gerçek uygulamada burada zengin metin editörü (TinyMCE, Quill, vb.) kullanılacaktır.

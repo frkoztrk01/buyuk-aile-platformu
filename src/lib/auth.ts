@@ -26,14 +26,9 @@ export type Session = typeof auth.$Infer.Session;
 // Server-side auth helpers
 export async function getSession(request?: Request) {
   if (request) {
-    // Convert Request headers to Headers object
-    const headers = new Headers();
-    request.headers.forEach((value, key) => {
-      headers.set(key, value);
-    });
-    
+    // Pass through the request Headers (copying broke Cookie in some Next/route setups)
     return await auth.api.getSession({
-      headers: headers,
+      headers: request.headers,
     });
   } else {
     // Use Next.js headers() for server components

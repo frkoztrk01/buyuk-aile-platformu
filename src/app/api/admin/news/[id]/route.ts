@@ -3,6 +3,10 @@ import db from '@/lib/db';
 import { news } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { requireAuth } from '@/lib/auth';
+import { slugifyNewsTitle } from '@/lib/slugify-news';
+import { postgresErrorCode, rootErrorMessage } from '@/lib/db-errors';
+
+const MAX_IMAGE_URL_CHARS = 2_000_000;
 
 // GET - Get single news item
 export async function GET(
@@ -41,21 +45,60 @@ export async function PUT(
 ) {
   try {
     await requireAuth(request);
-    
+
     const { id } = await params;
-    const body = await request.json();
-    const { title, slug, content, imageUrl, category, date, isPublished } = body;
-    
+
+    let body: Record<string, unknown>;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        { error: 'Geçersiz istek gövdesi (JSON çok büyük veya hatalı olabilir)' },
+        { status: 400 }
+      );
+    }
+
+    const { title, content, imageUrl, category, date, isPublished } = body;
+
+    if (!title || !content || !category) {
+      return NextResponse.json(
+        { error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+
+    const imageStr = typeof imageUrl === 'string' ? imageUrl : '';
+    if (imageStr.length > MAX_IMAGE_URL_CHARS) {
+      return NextResponse.json(
+        {
+          error:
+            'Görsel verisi çok büyük. Lütfen daha küçük bir görsel kullanın veya önce dosya yükleyerek URL ile kaydedin.',
+        },
+        { status: 413 }
+      );
+    }
+
+    const slugResolved = slugifyNewsTitle(String(title ?? ''));
+
+    let dateValue: Date | undefined;
+    if (date !== undefined && date !== null && String(date).length > 0) {
+      const parsed = new Date(String(date));
+      if (Number.isNaN(parsed.getTime())) {
+        return NextResponse.json({ error: 'Geçersiz tarih' }, { status: 400 });
+      }
+      dateValue = parsed;
+    }
+
     const [updatedNews] = await db
       .update(news)
       .set({
-        title,
-        slug,
-        content,
-        imageUrl: imageUrl || null,
-        category,
-        date: date ? new Date(date) : undefined,
-        isPublished,
+        title: String(title),
+        slug: slugResolved,
+        content: String(content),
+        imageUrl: imageStr || null,
+        category: String(category),
+        ...(dateValue !== undefined ? { date: dateValue } : {}),
+        isPublished: Boolean(isPublished),
         updatedAt: new Date(),
       })
       .where(eq(news.id, id))
@@ -78,16 +121,18 @@ export async function PUT(
         { status: 401 }
       );
     }
-    
-    if (error.code === '23505') {
+
+    const pgCode = postgresErrorCode(error);
+    if (pgCode === '23505') {
       return NextResponse.json(
-        { error: 'A news item with this slug already exists' },
+        { error: 'Bu slug zaten kullanılıyor; başlığı değiştirerek tekrar deneyin.' },
         { status: 409 }
       );
     }
     
+    const detail = rootErrorMessage(error);
     return NextResponse.json(
-      { error: 'Failed to update news' },
+      { error: detail || 'Failed to update news' },
       { status: 500 }
     );
   }
