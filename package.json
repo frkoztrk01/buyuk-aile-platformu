@@ -11,7 +11,10 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "wp:import-json": "tsx scripts/wp-migrate/run-json-import.ts"
+    "wp:import-json": "tsx scripts/wp-migrate/run-json-import.ts",
+    "wp:sync-uploads": "tsx scripts/wp-migrate/sync-uploads-from-downloads.ts",
+    "wp:fix-media-urls": "tsx scripts/wp-migrate/fix-wp-media-urls-in-db.ts",
+    "wp:prune-uploads": "tsx scripts/wp-migrate/prune-uploads.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.967.0",

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { founders } from '@/lib/db/schema';
+import { withResolvedFounderFields } from '@/lib/media-url';
 
 // GET - List founders (public API)
 export async function GET(request: NextRequest) {
@@ -19,7 +20,7 @@ export async function GET(request: NextRequest) {
       allFounders = allFounders.slice(0, limitNum);
     }
     
-    return NextResponse.json(allFounders);
+    return NextResponse.json(allFounders.map(withResolvedFounderFields));
   } catch (error) {
     console.error('Error fetching founders:', error);
     return NextResponse.json(

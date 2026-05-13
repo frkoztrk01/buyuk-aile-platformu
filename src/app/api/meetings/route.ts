@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { meetings } from '@/lib/db/schema';
+import { withResolvedMeetingFields } from '@/lib/media-url';
 import { desc } from 'drizzle-orm';
 
 // GET - List published meetings (public API)
@@ -20,7 +21,7 @@ export async function GET(request: NextRequest) {
       allMeetings = allMeetings.slice(0, limitNum);
     }
     
-    return NextResponse.json(allMeetings);
+    return NextResponse.json(allMeetings.map(withResolvedMeetingFields));
   } catch (error) {
     console.error('Error fetching meetings:', error);
     return NextResponse.json(

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { mutabakat } from '@/lib/db/schema';
+import { withResolvedMutabakatFields } from '@/lib/media-url';
 import { requireAuth } from '@/lib/auth';
 
 // GET - Get mutabakat content (single record)
@@ -12,7 +13,9 @@ export async function GET(request: NextRequest) {
       .limit(1);
     
     // If no content exists, return empty object
-    return NextResponse.json(mutabakatContent || null);
+    return NextResponse.json(
+      mutabakatContent ? withResolvedMutabakatFields(mutabakatContent) : null
+    );
   } catch (error) {
     console.error('Error fetching mutabakat:', error);
     return NextResponse.json(
