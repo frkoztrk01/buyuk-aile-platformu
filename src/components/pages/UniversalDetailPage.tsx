@@ -4,6 +4,7 @@ import { useRef, useEffect } from 'react';
 import { gsap } from 'gsap';
 import { ArrowUpRight, Calendar, MapPin, Clock, Download, Facebook, Twitter, Instagram } from 'lucide-react';
 import Link from 'next/link';
+import { SOCIAL_LINKS } from '@/lib/site-social';
 
 interface DetailPageProps {
   type: 'news' | 'event' | 'announcement';
@@ -208,15 +209,17 @@ export default function UniversalDetailPage({
                 </h3>
                 <div className="flex gap-2">
                   {[
-                    { icon: Facebook, href: '#', label: 'Facebook' },
-                    { icon: Twitter, href: '#', label: 'X (Twitter)' },
-                    { icon: Instagram, href: '#', label: 'Instagram' },
+                    { icon: Facebook, href: SOCIAL_LINKS.facebook, label: 'Facebook' },
+                    { icon: Twitter, href: SOCIAL_LINKS.twitter, label: 'X (Twitter)' },
+                    { icon: Instagram, href: SOCIAL_LINKS.instagram, label: 'Instagram' },
                   ].map((social) => {
                     const Icon = social.icon;
                     return (
                       <a
                         key={social.label}
                         href={social.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="w-10 h-10 border border-[#1E3A5F] flex items-center justify-center hover:bg-[#1E3A5F] hover:border-[#1E3A5F] transition-none group"
                         aria-label={social.label}
                       >

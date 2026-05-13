@@ -2,15 +2,14 @@ import AdminLayout from '@/components/admin/AdminLayout';
 import AdminFoundersEditor from '@/components/admin/AdminFoundersEditor';
 
 interface PageProps {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>;
 }
 
-export default function AdminEditFounderPage({ params }: PageProps) {
+export default async function AdminEditFounderPage({ params }: PageProps) {
+  const { id } = await params;
   return (
     <AdminLayout>
-      <AdminFoundersEditor mode="edit" founderId={params.id} />
+      <AdminFoundersEditor mode="edit" founderId={id} />
     </AdminLayout>
   );
 }

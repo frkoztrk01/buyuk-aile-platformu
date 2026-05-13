@@ -5,6 +5,13 @@ import { withResolvedMeetingFields } from '@/lib/media-url';
 import { eq } from 'drizzle-orm';
 import { requireAuth } from '@/lib/auth';
 
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function isValidMeetingId(id: string | undefined): boolean {
+  return Boolean(id && id !== 'undefined' && UUID_RE.test(id));
+}
+
 // GET - Get single meeting
 export async function GET(
   request: NextRequest,
@@ -12,6 +19,9 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+    if (!isValidMeetingId(id)) {
+      return NextResponse.json({ error: 'Geçersiz buluşma kimliği' }, { status: 400 });
+    }
     const [meeting] = await db
       .select()
       .from(meetings)
@@ -44,6 +54,9 @@ export async function PUT(
     await requireAuth();
     
     const { id } = await params;
+    if (!isValidMeetingId(id)) {
+      return NextResponse.json({ error: 'Geçersiz buluşma kimliği' }, { status: 400 });
+    }
     const body = await request.json();
     const { title, date, videoUrl, description, orderIndex } = body;
     
@@ -86,6 +99,9 @@ export async function DELETE(
     await requireAuth();
     
     const { id } = await params;
+    if (!isValidMeetingId(id)) {
+      return NextResponse.json({ error: 'Geçersiz buluşma kimliği' }, { status: 400 });
+    }
     const [deletedMeeting] = await db
       .delete(meetings)
       .where(eq(meetings.id, id))

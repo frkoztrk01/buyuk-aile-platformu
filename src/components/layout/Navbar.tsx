@@ -10,6 +10,7 @@ import MegaMenu from '../ui/MegaMenu';
 import Link from 'next/link';
 import LanguageSelector from '@/components/LanguageSelector';
 import { GoogleTranslateContext, type TranslateLang } from '@/components/GoogleTranslateProvider';
+import { SOCIAL_LINKS } from '@/lib/site-social';
 
 interface NavLink {
   label: string;
@@ -423,16 +424,20 @@ export default function Navbar() {
             {/* Social Media Icons & Language Selector - Far Right (Desktop Only) */}
             <div className="hidden lg:flex col-span-2 items-center justify-center h-full border-l border-white/20 gap-2 px-4">
               {[
-                { icon: Facebook, href: '#', label: 'Facebook' },
-                { icon: Twitter, href: '#', label: 'X (Twitter)' },
-                { icon: Instagram, href: '#', label: 'Instagram' },
-                { icon: Youtube, href: '#', label: 'YouTube' },
+                { icon: Facebook, href: SOCIAL_LINKS.facebook, label: 'Facebook' },
+                { icon: Twitter, href: SOCIAL_LINKS.twitter, label: 'X (Twitter)' },
+                { icon: Instagram, href: SOCIAL_LINKS.instagram, label: 'Instagram' },
+                ...(SOCIAL_LINKS.youtube
+                  ? [{ icon: Youtube, href: SOCIAL_LINKS.youtube, label: 'YouTube' as const }]
+                  : []),
               ].map((social) => {
                 const Icon = social.icon;
                 return (
                   <a
                     key={social.label}
                     href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-8 h-8 border border-white/20 flex items-center justify-center hover:bg-white hover:border-white transition-none group"
                     aria-label={social.label}
                   >

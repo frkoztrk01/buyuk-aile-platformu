@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { MapPin, Phone, Mail, X, Instagram, Facebook, Youtube } from 'lucide-react';
+import { SOCIAL_LINKS } from '@/lib/site-social';
 
 export default function ContactPage() {
   const formRef = useRef<HTMLFormElement>(null);
@@ -324,37 +325,43 @@ export default function ContactPage() {
                 </h3>
                 <div className="flex items-center gap-3">
                   <a
-                    href="https://x.com"
+                    href={SOCIAL_LINKS.twitter}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-12 h-12 border border-[#1E3A5F] flex items-center justify-center hover:bg-[#1E3A5F] group transition-none"
+                    aria-label="X (Twitter)"
                   >
                     <X className="w-5 h-5 text-[#1E3A5F] group-hover:text-white transition-none" />
                   </a>
                   <a
-                    href="https://instagram.com"
+                    href={SOCIAL_LINKS.instagram}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-12 h-12 border border-[#1E3A5F] flex items-center justify-center hover:bg-[#1E3A5F] group transition-none"
+                    aria-label="Instagram"
                   >
                     <Instagram className="w-5 h-5 text-[#1E3A5F] group-hover:text-white transition-none" />
                   </a>
                   <a
-                    href="https://facebook.com"
+                    href={SOCIAL_LINKS.facebook}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-12 h-12 border border-[#1E3A5F] flex items-center justify-center hover:bg-[#1E3A5F] group transition-none"
+                    aria-label="Facebook"
                   >
                     <Facebook className="w-5 h-5 text-[#1E3A5F] group-hover:text-white transition-none" />
                   </a>
-                  <a
-                    href="https://youtube.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-12 h-12 border border-[#1E3A5F] flex items-center justify-center hover:bg-[#1E3A5F] group transition-none"
-                  >
-                    <Youtube className="w-5 h-5 text-[#1E3A5F] group-hover:text-white transition-none" />
-                  </a>
+                  {SOCIAL_LINKS.youtube ? (
+                    <a
+                      href={SOCIAL_LINKS.youtube}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-12 h-12 border border-[#1E3A5F] flex items-center justify-center hover:bg-[#1E3A5F] group transition-none"
+                      aria-label="YouTube"
+                    >
+                      <Youtube className="w-5 h-5 text-[#1E3A5F] group-hover:text-white transition-none" />
+                    </a>
+                  ) : null}
                 </div>
               </div>
             </div>

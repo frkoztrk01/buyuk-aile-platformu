@@ -98,7 +98,7 @@ export default function AdminMutabakatEditor() {
 
       const data = await response.json();
       setPdfUrl(data.url);
-      showSuccess('PDF dosyası S3\'e başarıyla yüklendi');
+      showSuccess('Dosya başarıyla yüklendi');
     } catch (error: any) {
       console.error('Error uploading file:', error);
       showError(error.message || 'PDF yüklenirken bir hata oluştu');

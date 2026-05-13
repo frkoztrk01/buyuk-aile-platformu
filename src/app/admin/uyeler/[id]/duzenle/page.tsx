@@ -2,15 +2,14 @@ import AdminLayout from '@/components/admin/AdminLayout';
 import AdminMembersEditor from '@/components/admin/AdminMembersEditor';
 
 interface PageProps {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>;
 }
 
-export default function AdminEditMemberPage({ params }: PageProps) {
+export default async function AdminEditMemberPage({ params }: PageProps) {
+  const { id } = await params;
   return (
     <AdminLayout>
-      <AdminMembersEditor mode="edit" memberId={params.id} />
+      <AdminMembersEditor mode="edit" memberId={id} />
     </AdminLayout>
   );
 }
