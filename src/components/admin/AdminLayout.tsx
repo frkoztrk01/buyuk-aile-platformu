@@ -7,7 +7,8 @@ import {
   Newspaper, 
   Users, 
   Building2, 
-  Calendar, 
+  Calendar,
+  CalendarDays,
   MessageSquare,
   Video,
   FileText,
@@ -30,6 +31,7 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { label: 'Haberler', href: '/admin/haberler', icon: Newspaper },
+  { label: 'Etkinlikler', href: '/admin/etkinlikler', icon: CalendarDays },
   { label: 'Üyeler', href: '/admin/uyeler', icon: Users },
   { label: 'Kurucu Kuruluşlar', href: '/admin/kurucu-kuruluslar', icon: Building2 },
   { label: 'Buluşmalar', href: '/admin/bulusmalar', icon: Calendar },

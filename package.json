@@ -10,7 +10,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "wp:import-json": "tsx scripts/wp-migrate/run-json-import.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.967.0",
@@ -34,6 +35,7 @@
     "drizzle-kit": "^0.31.8",
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
+    "mysql2": "^3.22.3",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5"

@@ -20,6 +20,9 @@
 # production
 /build
 
+# WordPress / local media mirror (see scripts or rsync from Downloads)
+/public/uploads
+
 # misc
 .DS_Store
 *.pem

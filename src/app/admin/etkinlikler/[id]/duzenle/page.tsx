@@ -7,10 +7,10 @@ interface PageProps {
   };
 }
 
-export default function AdminEditNewsPage({ params }: PageProps) {
+export default function AdminEditEventPage({ params }: PageProps) {
   return (
     <AdminLayout>
-      <AdminContentEditor mode="edit" newsId={params.id} contentKind="news" />
+      <AdminContentEditor mode="edit" newsId={params.id} contentKind="event" />
     </AdminLayout>
   );
 }
