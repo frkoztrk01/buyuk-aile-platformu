@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { meetings } from '@/lib/db/schema';
+import { withResolvedMeetingFields } from '@/lib/media-url';
 import { desc } from 'drizzle-orm';
 import { requireAuth } from '@/lib/auth';
 
@@ -12,7 +13,7 @@ export async function GET(request: NextRequest) {
       .from(meetings)
       .orderBy(desc(meetings.date));
     
-    return NextResponse.json(allMeetings);
+    return NextResponse.json(allMeetings.map(withResolvedMeetingFields));
   } catch (error) {
     console.error('Error fetching meetings:', error);
     return NextResponse.json(

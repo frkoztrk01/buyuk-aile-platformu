@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { news } from '@/lib/db/schema';
+import { withResolvedNewsFields } from '@/lib/media-url';
 import { eq, desc, and } from 'drizzle-orm';
 
 // GET - List published news (public API)
@@ -26,7 +27,7 @@ export async function GET(request: NextRequest) {
         );
       }
       
-      return NextResponse.json(newsItem);
+      return NextResponse.json(withResolvedNewsFields(newsItem));
     }
     
     // Get news list
@@ -52,7 +53,7 @@ export async function GET(request: NextRequest) {
       allNews = allNews.slice(0, limitNum);
     }
     
-    return NextResponse.json(allNews);
+    return NextResponse.json(allNews.map(withResolvedNewsFields));
   } catch (error) {
     console.error('Error fetching news:', error);
     return NextResponse.json(

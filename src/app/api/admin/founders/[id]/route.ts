@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { founders } from '@/lib/db/schema';
+import { withResolvedFounderFields } from '@/lib/media-url';
 import { eq } from 'drizzle-orm';
 import { requireAuth } from '@/lib/auth';
 
@@ -24,7 +25,7 @@ export async function GET(
       );
     }
     
-    return NextResponse.json(founder);
+    return NextResponse.json(withResolvedFounderFields(founder));
   } catch (error) {
     console.error('Error fetching founder:', error);
     return NextResponse.json(

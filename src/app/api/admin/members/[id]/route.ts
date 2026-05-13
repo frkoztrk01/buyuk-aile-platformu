@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { members } from '@/lib/db/schema';
+import { withResolvedMemberFields } from '@/lib/media-url';
 import { eq } from 'drizzle-orm';
 import { requireAuth } from '@/lib/auth';
 
@@ -24,7 +25,7 @@ export async function GET(
       );
     }
     
-    return NextResponse.json(member);
+    return NextResponse.json(withResolvedMemberFields(member));
   } catch (error) {
     console.error('Error fetching member:', error);
     return NextResponse.json(

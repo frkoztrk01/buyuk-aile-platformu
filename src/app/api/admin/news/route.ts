@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { news } from '@/lib/db/schema';
+import { withResolvedNewsFields } from '@/lib/media-url';
 import { eq, desc, and, ne, type SQL } from 'drizzle-orm';
 import { requireAuth } from '@/lib/auth';
 import { slugifyNewsTitle } from '@/lib/slugify-news';
@@ -48,7 +49,7 @@ export async function GET(request: NextRequest) {
         .orderBy(desc(news.date));
     }
 
-    return NextResponse.json(allNews);
+    return NextResponse.json(allNews.map(withResolvedNewsFields));
   } catch (error: any) {
     console.error('Error fetching news:', error);
     return NextResponse.json(

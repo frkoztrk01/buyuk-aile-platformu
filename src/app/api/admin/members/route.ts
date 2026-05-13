@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { members } from '@/lib/db/schema';
-import { eq } from 'drizzle-orm';
+import { withResolvedMemberFields } from '@/lib/media-url';
 import { requireAuth } from '@/lib/auth';
 
 // GET - List all members
@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
       .from(members)
       .orderBy(members.name);
     
-    return NextResponse.json(allMembers);
+    return NextResponse.json(allMembers.map(withResolvedMemberFields));
   } catch (error) {
     console.error('Error fetching members:', error);
     return NextResponse.json(

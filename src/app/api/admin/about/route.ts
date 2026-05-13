@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { about } from '@/lib/db/schema';
+import { withResolvedAboutFields } from '@/lib/media-url';
 import { requireAuth } from '@/lib/auth';
 
 // GET - Get about content (single record)
@@ -12,7 +13,9 @@ export async function GET(request: NextRequest) {
       .limit(1);
     
     // If no content exists, return empty object
-    return NextResponse.json(aboutContent || null);
+    return NextResponse.json(
+      aboutContent ? withResolvedAboutFields(aboutContent) : null
+    );
   } catch (error) {
     console.error('Error fetching about:', error);
     return NextResponse.json(
