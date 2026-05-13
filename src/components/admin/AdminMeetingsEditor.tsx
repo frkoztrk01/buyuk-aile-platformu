@@ -65,6 +65,10 @@ export default function AdminMeetingsEditor({
       showError('Başlık gereklidir');
       return;
     }
+    if (mode === 'edit' && !meetingId?.trim()) {
+      showError('Buluşma kimliği bulunamadı; sayfayı yenileyin.');
+      return;
+    }
 
     try {
       setIsSaving(true);

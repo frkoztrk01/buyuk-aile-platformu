@@ -2,15 +2,14 @@ import AdminLayout from '@/components/admin/AdminLayout';
 import AdminContentEditor from '@/components/admin/AdminContentEditor';
 
 interface PageProps {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>;
 }
 
-export default function AdminEditEventPage({ params }: PageProps) {
+export default async function AdminEditEventPage({ params }: PageProps) {
+  const { id } = await params;
   return (
     <AdminLayout>
-      <AdminContentEditor mode="edit" newsId={params.id} contentKind="event" />
+      <AdminContentEditor mode="edit" newsId={id} contentKind="event" />
     </AdminLayout>
   );
 }

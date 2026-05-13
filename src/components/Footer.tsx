@@ -3,6 +3,7 @@
 import { Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { SOCIAL_LINKS } from '@/lib/site-social';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -100,16 +101,20 @@ export default function Footer() {
             </h3>
             <div className="flex gap-2 lg:gap-3 mb-6 lg:mb-8">
               {[
-                { icon: Facebook, href: '#', label: 'Facebook' },
-                { icon: Twitter, href: '#', label: 'X (Twitter)' },
-                { icon: Instagram, href: '#', label: 'Instagram' },
-                { icon: Youtube, href: '#', label: 'YouTube' },
+                { icon: Facebook, href: SOCIAL_LINKS.facebook, label: 'Facebook' },
+                { icon: Twitter, href: SOCIAL_LINKS.twitter, label: 'X (Twitter)' },
+                { icon: Instagram, href: SOCIAL_LINKS.instagram, label: 'Instagram' },
+                ...(SOCIAL_LINKS.youtube
+                  ? [{ icon: Youtube, href: SOCIAL_LINKS.youtube, label: 'YouTube' as const }]
+                  : []),
               ].map((social) => {
                 const Icon = social.icon;
                 return (
                   <a
                     key={social.label}
                     href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-11 h-11 lg:w-10 lg:h-10 border border-white/20 flex items-center justify-center hover:bg-white hover:border-white transition-none group min-w-[44px] min-h-[44px]"
                     aria-label={social.label}
                   >
