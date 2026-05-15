@@ -39,6 +39,7 @@ const menuItems: MenuItem[] = [
   { label: 'Buluşmalar', href: '/admin/bulusmalar', icon: Calendar },
   { label: 'Videolar', href: '/admin/videolar', icon: Video },
   { label: 'Hakkımızda', href: '/admin/hakkimizda', icon: FileText },
+  { label: 'Manifesto', href: '/admin/manifesto', icon: FileText },
   { label: 'Mutabakat Zaptı', href: '/admin/mutabakat', icon: FileText },
   { label: 'İletişim Mesajları', href: '/admin/iletisim', icon: MessageSquare },
 ];

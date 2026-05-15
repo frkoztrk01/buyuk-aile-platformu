@@ -72,6 +72,15 @@ export function withResolvedMutabakatFields<
   };
 }
 
+export function withResolvedManifestoFields<
+  T extends { pdfUrl: string | null },
+>(row: T): T {
+  return {
+    ...row,
+    pdfUrl: row.pdfUrl ? resolvePublicMediaUrl(row.pdfUrl) : row.pdfUrl,
+  };
+}
+
 export function withResolvedMemberFields<T extends { name: string }>(row: T): T {
   return {
     ...row,

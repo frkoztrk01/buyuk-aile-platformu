@@ -3,31 +3,31 @@
 import { useRef, useEffect, useState } from 'react';
 import { gsap } from 'gsap';
 import { Loader2, FileText } from 'lucide-react';
+import type { Manifesto } from '@/lib/db/schema';
 import KurumsalSidebar from '@/components/layout/KurumsalSidebar';
-import type { Mutabakat } from '@/lib/db/schema';
 
-export default function MutabakatPage() {
+export default function ManifestoPage() {
   const heroTitleRef = useRef<HTMLHeadingElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const [mutabakatData, setMutabakatData] = useState<Mutabakat | null>(null);
+  const [manifestoData, setManifestoData] = useState<Manifesto | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchMutabakat();
+    fetchManifesto();
   }, []);
 
-  const fetchMutabakat = async () => {
+  const fetchManifesto = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/mutabakat');
+      const response = await fetch('/api/manifesto');
       if (!response.ok) {
-        throw new Error('Failed to fetch mutabakat');
+        throw new Error('Failed to fetch manifesto');
       }
       const data = await response.json();
-      setMutabakatData(data);
+      setManifestoData(data);
     } catch (error) {
-      console.error('Error fetching mutabakat:', error);
+      console.error('Error fetching manifesto:', error);
     } finally {
       setIsLoading(false);
     }
@@ -83,7 +83,7 @@ export default function MutabakatPage() {
         }
       );
     }
-  }, [isLoading, mutabakatData]);
+  }, [isLoading, manifestoData]);
 
   if (isLoading) {
     return (
@@ -113,7 +113,7 @@ export default function MutabakatPage() {
               className="text-3xl lg:text-4xl xl:text-6xl 2xl:text-7xl font-bold uppercase tracking-tighter text-[#1E3A5F] font-montserrat leading-none mb-6 lg:mb-8 text-center"
               style={{ opacity: 0 }}
             >
-              {mutabakatData?.title || 'MUTABAKAT ZAPTI'}
+              {manifestoData?.title || 'MANİFESTO'}
             </h1>
           </div>
         </div>
@@ -125,18 +125,18 @@ export default function MutabakatPage() {
         <div className="relative grid grid-cols-1 lg:grid-cols-10 gap-0 py-12 lg:py-20 px-5 lg:px-12">
           {/* Sidebar - Kurumsal Menu - Full width on mobile */}
           <div ref={sidebarRef} className="col-span-1 lg:col-span-3 pr-0 lg:pr-12 mb-8 lg:mb-0" style={{ opacity: 0 }}>
-            <KurumsalSidebar activeHref="/mutabakat" />
+            <KurumsalSidebar activeHref="/manifesto" />
           </div>
 
           {/* Main Content - Full width on mobile */}
           <div ref={contentRef} className="col-span-1 lg:col-span-7 pl-0 lg:pl-12" style={{ opacity: 0 }}>
-            {mutabakatData?.pdfUrl ? (
+            {manifestoData?.pdfUrl ? (
               <div className="space-y-4">
                 <div className="border border-black/10" style={{ height: 'calc(100vh - 200px)', minHeight: '600px' }}>
                   <iframe
-                    src={mutabakatData.pdfUrl}
+                    src={manifestoData.pdfUrl}
                     className="w-full h-full"
-                    title="Mutabakat Zaptı PDF"
+                    title="Manifesto PDF"
                     style={{ border: 'none' }}
                   />
                 </div>
@@ -149,7 +149,7 @@ export default function MutabakatPage() {
               <div className="flex flex-col items-center justify-center py-12 border border-black/10 bg-gray-50">
                 <FileText className="w-16 h-16 text-gray-400 mb-4" />
                 <p className="text-base lg:text-lg leading-relaxed text-[#1E3A5F] font-sans">
-                  PDF dosyası henüz eklenmemiş.
+                  Manifesto PDF dosyası henüz eklenmemiş.
                 </p>
               </div>
             )}
