@@ -73,11 +73,15 @@ export function withResolvedMutabakatFields<
 }
 
 export function withResolvedManifestoFields<
-  T extends { pdfUrl: string | null },
+  T extends { pdfUrl: string | null; pdfUrl2?: string | null },
 >(row: T): T {
   return {
     ...row,
     pdfUrl: row.pdfUrl ? resolvePublicMediaUrl(row.pdfUrl) : row.pdfUrl,
+    pdfUrl2:
+      row.pdfUrl2 != null && row.pdfUrl2 !== ''
+        ? resolvePublicMediaUrl(row.pdfUrl2)
+        : row.pdfUrl2 ?? null,
   };
 }
 
