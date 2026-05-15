@@ -20,6 +20,21 @@ export function withResolvedNewsFields<
   };
 }
 
+export function withResolvedHomeHeroFields<
+  T extends {
+    backgroundImageUrl: string | null;
+    logoUrl: string | null;
+  },
+>(row: T): T {
+  return {
+    ...row,
+    backgroundImageUrl: row.backgroundImageUrl
+      ? resolvePublicMediaUrl(row.backgroundImageUrl)
+      : row.backgroundImageUrl,
+    logoUrl: row.logoUrl ? resolvePublicMediaUrl(row.logoUrl) : row.logoUrl,
+  };
+}
+
 export function withResolvedAboutFields<
   T extends {
     content: string;

@@ -12,7 +12,8 @@ import {
   MessageSquare,
   Video,
   FileText,
-  LogOut
+  LogOut,
+  Home,
 } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
 import { ToastContainer } from '../ui/Toast';
@@ -30,6 +31,7 @@ interface MenuItem {
 
 const menuItems: MenuItem[] = [
   { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+  { label: 'Ana Sayfa Hero', href: '/admin/anasayfa-hero', icon: Home },
   { label: 'Haberler', href: '/admin/haberler', icon: Newspaper },
   { label: 'Etkinlikler', href: '/admin/etkinlikler', icon: CalendarDays },
   { label: 'Üyeler', href: '/admin/uyeler', icon: Users },

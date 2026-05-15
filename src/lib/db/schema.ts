@@ -73,6 +73,28 @@ export const about = pgTable("about", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// Ana sayfa hero (landing üst bölüm)
+export const homeHero = pgTable("home_hero", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  backgroundImageUrl: text("background_image_url"),
+  logoUrl: text("logo_url"),
+  headline: text("headline"),
+  subtext: text("subtext"),
+  ctaLabel: text("cta_label"),
+  ctaHref: text("cta_href"),
+  missionTitle: text("mission_title"),
+  missionBody: text("mission_body"),
+  missionBullets: text("mission_bullets"),
+  visionTitle: text("vision_title"),
+  visionBody: text("vision_body"),
+  visionBullets: text("vision_bullets"),
+  valuesTitle: text("values_title"),
+  valuesBody: text("values_body"),
+  valuesBullets: text("values_bullets"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 // Mutabakat table (Mutabakat Zaptı)
 export const mutabakat = pgTable("mutabakat", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -174,6 +196,9 @@ export type NewVideo = typeof videos.$inferInsert;
 
 export type About = typeof about.$inferSelect;
 export type NewAbout = typeof about.$inferInsert;
+
+export type HomeHero = typeof homeHero.$inferSelect;
+export type NewHomeHero = typeof homeHero.$inferInsert;
 
 export type Mutabakat = typeof mutabakat.$inferSelect;
 export type NewMutabakat = typeof mutabakat.$inferInsert;
