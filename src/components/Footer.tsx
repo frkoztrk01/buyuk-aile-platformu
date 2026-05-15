@@ -42,6 +42,7 @@ export default function Footer() {
               {[
                 { label: 'Anasayfa', href: '/' },
                 { label: 'Hakkımızda', href: '/hakkimizda' },
+                { label: 'Manifesto', href: '/manifesto' },
                 { label: 'Mutabakat Zaptı', href: '/mutabakat' },
                 { label: 'Kurucu Kuruluşlar', href: '/kurucu-kuruluslar' },
                 { label: 'Üyeler', href: '/uyeler' },

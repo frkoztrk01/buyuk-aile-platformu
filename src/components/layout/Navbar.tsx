@@ -67,6 +67,12 @@ export default function Navbar() {
           ],
         },
         {
+          title: 'Manifesto',
+          items: [
+            { label: 'Manifesto', href: '/manifesto' },
+          ],
+        },
+        {
           title: 'Mutabakat Zaptı',
           items: [
             { label: 'Mutabakat Zaptı', href: '/mutabakat' },

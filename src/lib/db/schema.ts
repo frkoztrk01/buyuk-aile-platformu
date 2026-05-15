@@ -104,6 +104,15 @@ export const mutabakat = pgTable("mutabakat", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// Manifesto (Kurumsal — PDF)
+export const manifesto = pgTable("manifesto", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  title: text("title").notNull(),
+  pdfUrl: text("pdf_url"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 // Better Auth tables
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -202,6 +211,9 @@ export type NewHomeHero = typeof homeHero.$inferInsert;
 
 export type Mutabakat = typeof mutabakat.$inferSelect;
 export type NewMutabakat = typeof mutabakat.$inferInsert;
+
+export type Manifesto = typeof manifesto.$inferSelect;
+export type NewManifesto = typeof manifesto.$inferInsert;
 
 export type User = typeof user.$inferSelect;
 export type NewUser = typeof user.$inferInsert;

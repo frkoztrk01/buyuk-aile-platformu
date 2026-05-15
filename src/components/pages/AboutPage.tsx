@@ -2,8 +2,8 @@
 
 import { useRef, useEffect, useState } from 'react';
 import { gsap } from 'gsap';
-import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
+import KurumsalSidebar from '@/components/layout/KurumsalSidebar';
 import { markdownToHtml } from '@/lib/utils/markdown';
 import type { About } from '@/lib/db/schema';
 
@@ -229,32 +229,7 @@ export default function AboutPage() {
         <div className="relative grid grid-cols-1 lg:grid-cols-10 gap-0 py-12 lg:py-20 px-5 lg:px-12">
           {/* Sidebar - Kurumsal Menu - Full width on mobile, sticky on desktop */}
           <div ref={sidebarRef} className="col-span-1 lg:col-span-3 pr-0 lg:pr-12 mb-8 lg:mb-0" style={{ opacity: 0 }}>
-            <div className="lg:sticky lg:top-32">
-              <h3 className="uppercase text-xs font-bold tracking-widest mb-4 lg:mb-6 text-[#1E3A5F] font-montserrat">
-                Kurumsal
-              </h3>
-              <ul className="space-y-0 border border-black/10">
-                {[
-                  { label: 'Hakkımızda', href: '/hakkimizda', active: true },
-                  { label: 'Mutabakat Zaptı', href: '/mutabakat' },
-                  { label: 'Kurucu Kuruluşlar', href: '/kurucu-kuruluslar' },
-                  { label: 'Üyeler', href: '/uyeler' },
-                ].map((link, index) => (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className={`block px-4 lg:px-6 py-3 lg:py-4 text-sm uppercase tracking-wide font-sans transition-none border-b border-black/10 last:border-b-0 min-h-[44px] flex items-center ${
-                        link.active
-                          ? 'bg-[#1E3A5F] text-white font-bold'
-                          : 'text-[#1E3A5F] hover:bg-[#1E3A5F] hover:text-white'
-                      }`}
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <KurumsalSidebar activeHref="/hakkimizda" />
           </div>
 
           {/* Main Content - Full width on mobile */}
