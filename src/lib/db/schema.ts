@@ -109,6 +109,9 @@ export const manifesto = pgTable("manifesto", {
   id: uuid("id").defaultRandom().primaryKey(),
   title: text("title").notNull(),
   pdfUrl: text("pdf_url"),
+  pdfUrl2: text("pdf_url_2"),
+  pdf1Label: text("pdf_1_label"),
+  pdf2Label: text("pdf_2_label"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

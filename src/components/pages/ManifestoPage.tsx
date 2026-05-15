@@ -130,20 +130,39 @@ export default function ManifestoPage() {
 
           {/* Main Content - Full width on mobile */}
           <div ref={contentRef} className="col-span-1 lg:col-span-7 pl-0 lg:pl-12" style={{ opacity: 0 }}>
-            {manifestoData?.pdfUrl ? (
-              <div className="space-y-4">
-                <div className="border border-black/10" style={{ height: 'calc(100vh - 200px)', minHeight: '600px' }}>
-                  <iframe
-                    src={manifestoData.pdfUrl}
-                    className="w-full h-full"
-                    title="Manifesto PDF"
-                    style={{ border: 'none' }}
-                  />
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600 font-sans">
-                  <FileText className="w-4 h-4" />
-                  <span>PDF dosyası yükleniyor...</span>
-                </div>
+
+            {manifestoData?.pdfUrl || manifestoData?.pdfUrl2 ? (
+              <div className="space-y-10">
+                {manifestoData.pdfUrl && (
+                  <section>
+                    <h2 className="text-sm uppercase tracking-widest font-bold text-[#1E3A5F] font-montserrat mb-4">
+                      {manifestoData.pdf1Label?.trim() || '1. PDF'}
+                    </h2>
+                    <div className="border border-black/10" style={{ height: 'min(80vh, 900px)', minHeight: '480px' }}>
+                      <iframe
+                        src={manifestoData.pdfUrl}
+                        className="w-full h-full"
+                        title={manifestoData.pdf1Label || 'Manifesto PDF 1'}
+                        style={{ border: 'none' }}
+                      />
+                    </div>
+                  </section>
+                )}
+                {manifestoData.pdfUrl2 && (
+                  <section>
+                    <h2 className="text-sm uppercase tracking-widest font-bold text-[#1E3A5F] font-montserrat mb-4">
+                      {manifestoData.pdf2Label?.trim() || '2. PDF'}
+                    </h2>
+                    <div className="border border-black/10" style={{ height: 'min(80vh, 900px)', minHeight: '480px' }}>
+                      <iframe
+                        src={manifestoData.pdfUrl2}
+                        className="w-full h-full"
+                        title={manifestoData.pdf2Label || 'Manifesto PDF 2'}
+                        style={{ border: 'none' }}
+                      />
+                    </div>
+                  </section>
+                )}
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-12 border border-black/10 bg-gray-50">

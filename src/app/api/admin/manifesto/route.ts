@@ -18,26 +18,35 @@ export async function POST(request: NextRequest) {
   try {
     await requireAuth();
     const body = await request.json();
-    const { title, pdfUrl } = body;
+    const { title, pdfUrl, pdfUrl2, pdf1Label, pdf2Label } = body;
 
-    if (!title || !pdfUrl) {
+    if (!title?.trim()) {
+      return NextResponse.json({ error: 'Title is required' }, { status: 400 });
+    }
+    if (!pdfUrl && !pdfUrl2) {
       return NextResponse.json(
-        { error: 'Title and pdfUrl are required' },
+        { error: 'En az bir PDF yüklenmelidir' },
         { status: 400 }
       );
     }
+
+    const payload = {
+      title: title.trim(),
+      pdfUrl: pdfUrl ?? null,
+      pdfUrl2: pdfUrl2 ?? null,
+      pdf1Label: pdf1Label?.trim() || null,
+      pdf2Label: pdf2Label?.trim() || null,
+      updatedAt: new Date(),
+    };
 
     const [existing] = await db.select().from(manifesto).limit(1);
     let result;
 
     if (existing) {
-      const [updated] = await db
-        .update(manifesto)
-        .set({ title, pdfUrl, updatedAt: new Date() })
-        .returning();
+      const [updated] = await db.update(manifesto).set(payload).returning();
       result = updated;
     } else {
-      const [created] = await db.insert(manifesto).values({ title, pdfUrl }).returning();
+      const [created] = await db.insert(manifesto).values(payload).returning();
       result = created;
     }
 
