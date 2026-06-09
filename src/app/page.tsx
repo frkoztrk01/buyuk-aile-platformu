@@ -8,6 +8,8 @@ import { mergeHomeHeroFromDb } from '@/lib/home-hero-defaults';
 import { withResolvedHomeHeroFields } from '@/lib/media-url';
 import { getHomeHeroRow } from '@/lib/queries/home-hero';
 
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
   const heroRow = await getHomeHeroRow();
   const heroContent = mergeHomeHeroFromDb(

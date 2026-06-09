@@ -1,3 +1,4 @@
+import { revalidatePath } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { homeHero } from '@/lib/db/schema';
@@ -17,7 +18,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    await requireAuth();
+    await requireAuth(request);
     const body = await request.json();
 
     const {
@@ -68,7 +69,12 @@ export async function POST(request: NextRequest) {
       result = created;
     }
 
-    return NextResponse.json(result, { status: existing ? 200 : 201 });
+    revalidatePath('/');
+
+    return NextResponse.json(
+      withResolvedHomeHeroFields(result),
+      { status: existing ? 200 : 201 }
+    );
   } catch (error) {
     console.error('Error saving home hero:', error);
     return NextResponse.json({ error: 'Failed to save home hero' }, { status: 500 });

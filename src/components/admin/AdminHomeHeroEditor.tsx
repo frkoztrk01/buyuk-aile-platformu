@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Upload, X, Save, Loader2 } from 'lucide-react';
 import { useToast } from './useToast';
 import type { HomeHero } from '@/lib/db/schema';
-import { withResolvedHomeHeroFields } from '@/lib/media-url';
+import { resolvePublicMediaUrl, withResolvedHomeHeroFields } from '@/lib/media-url';
 import {
   HOME_HERO_DEFAULTS,
   mergeHomeHeroFromDb,
@@ -34,6 +34,7 @@ export default function AdminHomeHeroEditor() {
   const [valuesBullets, setValuesBullets] = useState('');
   const [dragBg, setDragBg] = useState(false);
   const [dragLogo, setDragLogo] = useState(false);
+  const [uploadingField, setUploadingField] = useState<'bg' | 'logo' | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -44,8 +45,8 @@ export default function AdminHomeHeroEditor() {
       const resolved = raw ? withResolvedHomeHeroFields(raw) : null;
       const merged = mergeHomeHeroFromDb(resolved);
 
-      setBackgroundImageUrl(raw?.backgroundImageUrl?.trim() ? resolved!.backgroundImageUrl : null);
-      setLogoUrl(raw?.logoUrl?.trim() ? resolved!.logoUrl : null);
+      setBackgroundImageUrl(raw?.backgroundImageUrl?.trim() ? raw.backgroundImageUrl : null);
+      setLogoUrl(raw?.logoUrl?.trim() ? raw.logoUrl : null);
       setHeadline(merged.headline);
       setSubtext(merged.subtext);
       setCtaLabel(merged.ctaLabel);
@@ -71,7 +72,11 @@ export default function AdminHomeHeroEditor() {
     load();
   }, [load]);
 
-  const readImageFile = (file: File, onDone: (dataUrl: string) => void) => {
+  const uploadImageFile = async (
+    file: File,
+    field: 'bg' | 'logo',
+    onDone: (url: string) => void
+  ) => {
     if (!file.type.startsWith('image/')) {
       showError('Lütfen bir resim dosyası seçin');
       return;
@@ -80,9 +85,25 @@ export default function AdminHomeHeroEditor() {
       showError("Dosya boyutu 5MB'dan küçük olmalıdır");
       return;
     }
-    const reader = new FileReader();
-    reader.onloadend = () => onDone(reader.result as string);
-    reader.readAsDataURL(file);
+
+    try {
+      setUploadingField(field);
+      const formData = new FormData();
+      formData.append('file', file);
+      const response = await fetch('/api/admin/upload', { method: 'POST', body: formData });
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error((err as { error?: string }).error || 'Yükleme başarısız');
+      }
+      const { url } = (await response.json()) as { url: string };
+      onDone(url);
+      showSuccess('Görsel yüklendi');
+    } catch (e: unknown) {
+      console.error(e);
+      showError(e instanceof Error ? e.message : 'Görsel yüklenirken hata oluştu');
+    } finally {
+      setUploadingField(null);
+    }
   };
 
   const renderImageDrop = (
@@ -93,9 +114,10 @@ export default function AdminHomeHeroEditor() {
     onClear: () => void,
     onFile: (f: File) => void,
     dragging: boolean,
-    setDrag: (v: boolean) => void
+    setDrag: (v: boolean) => void,
+    uploading: boolean
   ) => {
-    const preview = value ?? fallback;
+    const preview = value ? resolvePublicMediaUrl(value) || fallback : fallback;
     return (
       <div className="bg-white border border-black/10 p-6">
         <label className="block text-xs uppercase tracking-widest text-[#1E3A5F] font-montserrat font-bold mb-4">
@@ -139,10 +161,17 @@ export default function AdminHomeHeroEditor() {
               const f = e.target.files?.[0];
               if (f) onFile(f);
             }} />
-            <label htmlFor={id} className="cursor-pointer flex flex-col items-center gap-3">
-              <Upload className="w-10 h-10 text-[#1E3A5F]" />
+            <label
+              htmlFor={id}
+              className={`flex flex-col items-center gap-3 ${uploading ? 'pointer-events-none opacity-60' : 'cursor-pointer'}`}
+            >
+              {uploading ? (
+                <Loader2 className="w-10 h-10 text-[#1E3A5F] animate-spin" />
+              ) : (
+                <Upload className="w-10 h-10 text-[#1E3A5F]" />
+              )}
               <span className="text-sm font-bold uppercase tracking-widest text-[#1E3A5F] font-montserrat">
-                Görsel yükle
+                {uploading ? 'Yükleniyor...' : 'Görsel yükle'}
               </span>
               <span className="text-xs text-gray-500">PNG, JPG, SVG — en fazla 5MB</span>
             </label>
@@ -211,7 +240,7 @@ export default function AdminHomeHeroEditor() {
             <button
               type="button"
               onClick={handleSave}
-              disabled={isSaving}
+              disabled={isSaving || uploadingField !== null}
               className="flex items-center gap-2 px-6 py-3 bg-[#1E3A5F] text-white text-xs font-bold uppercase tracking-widest font-montserrat hover:bg-[#152A47] transition-none disabled:opacity-50"
             >
               {isSaving ? (
@@ -234,9 +263,10 @@ export default function AdminHomeHeroEditor() {
             backgroundImageUrl,
             HOME_HERO_DEFAULTS.backgroundImageUrl,
             () => setBackgroundImageUrl(null),
-            (f) => readImageFile(f, setBackgroundImageUrl),
+            (f) => uploadImageFile(f, 'bg', setBackgroundImageUrl),
             dragBg,
-            setDragBg
+            setDragBg,
+            uploadingField === 'bg'
           )}
 
           {renderImageDrop(
@@ -245,9 +275,10 @@ export default function AdminHomeHeroEditor() {
             logoUrl,
             HOME_HERO_DEFAULTS.logoUrl,
             () => setLogoUrl(null),
-            (f) => readImageFile(f, setLogoUrl),
+            (f) => uploadImageFile(f, 'logo', setLogoUrl),
             dragLogo,
-            setDragLogo
+            setDragLogo,
+            uploadingField === 'logo'
           )}
 
           <div className="bg-white border border-black/10 p-6 space-y-4">
