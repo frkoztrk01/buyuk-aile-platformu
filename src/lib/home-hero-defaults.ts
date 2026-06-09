@@ -53,6 +53,11 @@ export type MergedHomeHero = {
   valuesBullets: string[];
 };
 
+/** Varsayılan şerit logo değilse (admin’den yüklenen afiş/poster vb.) */
+export function isCustomHeroLogo(logoUrl: string): boolean {
+  return logoUrl.trim() !== HOME_HERO_DEFAULTS.logoUrl;
+}
+
 export function bulletsToMultiline(lines: readonly string[]): string {
   return lines.join('\n');
 }
