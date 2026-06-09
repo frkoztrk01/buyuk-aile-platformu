@@ -1,9 +1,20 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, type SyntheticEvent } from 'react';
 import { gsap } from 'gsap';
 import { ArrowRight } from 'lucide-react';
-import type { MergedHomeHero } from '@/lib/home-hero-defaults';
+import { isCustomHeroLogo, type MergedHomeHero } from '@/lib/home-hero-defaults';
+
+type HeroLogoLayout = 'brand' | 'promo';
+
+function resolveLogoLayout(logoUrl: string, width: number, height: number): HeroLogoLayout {
+  if (!width || !height) {
+    return isCustomHeroLogo(logoUrl) ? 'promo' : 'brand';
+  }
+  const aspect = height / width;
+  const isPromoGraphic = isCustomHeroLogo(logoUrl) || aspect > 0.38;
+  return isPromoGraphic ? 'promo' : 'brand';
+}
 
 type HeroProps = {
   content: MergedHomeHero;
@@ -15,6 +26,22 @@ export default function Hero({ content }: HeroProps) {
   const descriptionRef = useRef<HTMLParagraphElement>(null);
   const buttonRef = useRef<HTMLAnchorElement>(null);
   const rightPanelRef = useRef<HTMLDivElement>(null);
+  const [logoLayout, setLogoLayout] = useState<HeroLogoLayout>(() =>
+    isCustomHeroLogo(content.logoUrl) ? 'promo' : 'brand'
+  );
+
+  const isPromoLogo = logoLayout === 'promo';
+
+  useEffect(() => {
+    setLogoLayout(isCustomHeroLogo(content.logoUrl) ? 'promo' : 'brand');
+  }, [content.logoUrl]);
+
+  const handleLogoLoad = (event: SyntheticEvent<HTMLImageElement>) => {
+    const img = event.currentTarget;
+    setLogoLayout(
+      resolveLogoLayout(content.logoUrl, img.naturalWidth, img.naturalHeight)
+    );
+  };
 
   useEffect(() => {
     // Detect mobile for faster animations
@@ -126,24 +153,35 @@ export default function Hero({ content }: HeroProps) {
       <div className="relative z-10 box-border min-h-screen lg:h-full lg:min-h-0 px-5 lg:px-12 pt-[max(5rem,calc(4rem+env(safe-area-inset-top,0px)))] pb-20 lg:pt-[max(6rem,calc(6rem+env(safe-area-inset-top,0px)))] lg:pb-0 grid grid-cols-1 lg:grid-cols-12 lg:grid-rows-1 gap-0 lg:items-stretch">
         {/* Left Side - Main Title */}
         <div className="col-span-1 lg:col-span-7 flex flex-col justify-center min-h-[60vh] lg:h-full lg:min-h-0 pt-0 lg:pt-0 pb-8 lg:pb-0">
-          {/* Logo above the title */}
-          <div className="mb-4 lg:mb-8">
-            <div className="inline-block w-full max-w-md lg:max-w-lg xl:max-w-2xl overflow-hidden rounded-2xl lg:rounded-3xl align-top [isolation:isolate]">
+          {/* Logo — varsayılan şerit logo veya admin’den yüklenen afiş/poster */}
+          <div className={isPromoLogo ? 'mb-3 lg:mb-5' : 'mb-4 lg:mb-8'}>
+            <div
+              className={`inline-flex max-w-full items-center overflow-hidden [isolation:isolate] ${
+                isPromoLogo ? 'rounded-xl lg:rounded-2xl' : 'rounded-2xl lg:rounded-3xl'
+              }`}
+            >
               <img
                 src={content.logoUrl}
                 alt=""
-                width={480}
-                height={108}
-                className="block h-auto w-full object-contain border-0 shadow-none ring-0 outline-none focus:outline-none focus-visible:ring-0"
+                onLoad={handleLogoLoad}
+                className={`block h-auto w-auto max-w-full object-contain border-0 shadow-none ring-0 outline-none focus:outline-none focus-visible:ring-0 ${
+                  isPromoLogo
+                    ? 'max-h-44 max-w-[min(100%,18rem)] sm:max-w-xs lg:max-h-64 lg:max-w-sm xl:max-w-md'
+                    : 'max-h-16 lg:max-h-24'
+                }`}
               />
             </div>
           </div>
 
           <h1
             ref={titleRef}
-            className="uppercase font-black leading-[0.9] lg:leading-[0.85] tracking-tighter text-white font-montserrat antialiased mb-4 lg:mb-0"
+            className={`uppercase font-black tracking-tighter text-white font-montserrat antialiased mb-4 lg:mb-0 ${
+              isPromoLogo ? 'leading-[1.05] lg:leading-[1]' : 'leading-[0.9] lg:leading-[0.85]'
+            }`}
             style={{
-              fontSize: 'clamp(1.75rem, 7vw, 5.5rem)',
+              fontSize: isPromoLogo
+                ? 'clamp(1.125rem, 3.2vw, 2.25rem)'
+                : 'clamp(1.75rem, 7vw, 5.5rem)',
               opacity: 0,
             }}
           >
