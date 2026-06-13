@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { renderContentPlainText } from '@/lib/utils/markdown';
 import type { News } from '@/lib/db/schema';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -52,7 +53,9 @@ export default function PressCenterSlider() {
           dateDay: date.getDate().toString(),
           dateMonthYear: `${months[date.getMonth()]} ${date.getFullYear()}`,
           imageURL: item.imageUrl || '/images/banner.jpg',
-          excerpt: item.content ? item.content.replace(/<[^>]*>/g, '').substring(0, 120) + '...' : '',
+          excerpt: item.content
+            ? renderContentPlainText(item.content).substring(0, 120) + '...'
+            : '',
         };
       });
       

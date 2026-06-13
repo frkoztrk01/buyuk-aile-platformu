@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Upload, X, Save, Loader2, Eye } from 'lucide-react';
 import { useToast } from './useToast';
+import MarkdownEditor from '../ui/MarkdownEditor';
 import type { News } from '@/lib/db/schema';
 import { slugifyNewsTitle } from '@/lib/slugify-news';
 
@@ -390,23 +391,17 @@ export default function AdminContentEditor({
         )}
       </div>
 
-      {/* Rich Text Editor */}
-      <div className="bg-white border border-black/10 p-6">
-        <label className="block text-xs uppercase tracking-widest text-[#1E3A5F] font-montserrat font-bold mb-4">
-          İÇERİK
-        </label>
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          className="w-full min-h-[400px] px-4 py-3 border border-black/20 bg-white text-[#1E3A5F] font-sans text-base leading-relaxed focus:outline-none focus:border-[#1E3A5F] transition-none resize-none"
-          placeholder={
-            isEvent ? 'Etkinlik açıklamasını buraya yazın...' : 'Haber içeriğini buraya yazın...'
-          }
-        />
-          <p className="mt-2 text-xs text-gray-500 font-sans">
-            Not: Gerçek uygulamada burada zengin metin editörü (TinyMCE, Quill, vb.) kullanılacaktır.
-          </p>
-        </div>
+      {/* Content Markdown Editor */}
+      <MarkdownEditor
+        value={content}
+        onChange={setContent}
+        label="İÇERİK (MARKDOWN)"
+        placeholder={
+          isEvent
+            ? '## Etkinlik açıklaması\n\nEtkinlik detaylarını markdown formatında yazabilirsiniz.'
+            : '## Haber içeriği\n\n**Kalın metin**, *italik metin* ve [linkler](https://...) kullanabilirsiniz.'
+        }
+      />
         </>
       )}
     </div>

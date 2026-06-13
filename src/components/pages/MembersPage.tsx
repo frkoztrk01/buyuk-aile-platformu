@@ -3,6 +3,8 @@
 import { useRef, useEffect, useState } from 'react';
 import { gsap } from 'gsap';
 import { ArrowUpRight, Loader2 } from 'lucide-react';
+import MarkdownContent from '@/components/ui/MarkdownContent';
+import { markdownToPlainText } from '@/lib/utils/markdown';
 import type { Member } from '@/lib/db/schema';
 
 export default function MembersPage() {
@@ -26,9 +28,8 @@ export default function MembersPage() {
         throw new Error('Failed to fetch members');
       }
       const data = await response.json();
-      // Sort alphabetically
-      const sorted = data.sort((a: Member, b: Member) => 
-        a.name.localeCompare(b.name, 'tr')
+      const sorted = data.sort((a: Member, b: Member) =>
+        markdownToPlainText(a.name).localeCompare(markdownToPlainText(b.name), 'tr')
       );
       setAllMembers(sorted);
     } catch (error) {
@@ -42,9 +43,10 @@ export default function MembersPage() {
 
   // Filter members based on search and selected letter
   const filteredMembers = allMembers.filter((member) => {
-    const matchesSearch = member.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const plainName = markdownToPlainText(member.name);
+    const matchesSearch = plainName.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesLetter = selectedLetter
-      ? member.name.toUpperCase().startsWith(selectedLetter)
+      ? plainName.toUpperCase().startsWith(selectedLetter)
       : true;
     return matchesSearch && matchesLetter;
   });
@@ -127,7 +129,7 @@ export default function MembersPage() {
           {alphabet.map((letter) => {
             const isActive = selectedLetter === letter;
             const hasMembers = allMembers.some((member) =>
-              member.name.toUpperCase().startsWith(letter)
+              markdownToPlainText(member.name).toUpperCase().startsWith(letter)
             );
 
             return (
@@ -171,12 +173,10 @@ export default function MembersPage() {
               style={{ opacity: 0 }}
             >
               <div className="flex items-center justify-between">
-                    <div 
-                      className="text-sm lg:text-base font-semibold uppercase tracking-tight text-[#1E3A5F] group-hover:text-[#336699] transition-none font-montserrat flex-1"
-                      dangerouslySetInnerHTML={{ 
-                        __html: member.name.replace(/\n/g, '<br />') 
-                      }}
-                    />
+                <MarkdownContent
+                  content={member.name}
+                  className="text-sm lg:text-base font-semibold uppercase tracking-tight text-[#1E3A5F] group-hover:text-[#336699] transition-none font-montserrat flex-1"
+                />
                 <ArrowUpRight
                       className="w-4 h-4 text-[#1E3A5F] group-hover:text-[#336699] opacity-0 lg:opacity-0 lg:group-hover:opacity-100 transition-none flex-shrink-0 ml-4"
                 />
