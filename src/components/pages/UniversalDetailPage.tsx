@@ -5,6 +5,7 @@ import { gsap } from 'gsap';
 import { ArrowUpRight, Calendar, MapPin, Clock, Download, Facebook, Twitter, Instagram } from 'lucide-react';
 import Link from 'next/link';
 import { SOCIAL_LINKS } from '@/lib/site-social';
+import MarkdownContent from '@/components/ui/MarkdownContent';
 
 interface DetailPageProps {
   type: 'news' | 'event' | 'announcement';
@@ -191,10 +192,10 @@ export default function UniversalDetailPage({
             </div>
 
             {/* Content Body */}
-            <div ref={contentRef} className="prose prose-lg max-w-none">
-              <div
-                className="text-base lg:text-lg leading-relaxed text-[#1E3A5F] font-sans space-y-4 lg:space-y-6"
-                dangerouslySetInnerHTML={{ __html: content }}
+            <div ref={contentRef}>
+              <MarkdownContent
+                content={content}
+                className="text-base lg:text-lg leading-relaxed text-[#1E3A5F] font-sans"
               />
             </div>
           </div>

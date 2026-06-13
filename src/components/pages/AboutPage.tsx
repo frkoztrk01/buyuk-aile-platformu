@@ -4,7 +4,7 @@ import { useRef, useEffect, useState } from 'react';
 import { gsap } from 'gsap';
 import { Loader2 } from 'lucide-react';
 import KurumsalSidebar from '@/components/layout/KurumsalSidebar';
-import { markdownToHtml } from '@/lib/utils/markdown';
+import MarkdownContent from '@/components/ui/MarkdownContent';
 import type { About } from '@/lib/db/schema';
 
 export default function AboutPage() {
@@ -192,23 +192,13 @@ export default function AboutPage() {
               {aboutData?.content ? (() => {
                 const { firstParagraph } = getContentParts(aboutData.content);
                 if (firstParagraph) {
-                  // Convert markdown to plain text for first paragraph
-                  let plainText = firstParagraph
-                    .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold
-                    .replace(/\*(.*?)\*/g, '$1') // Remove italic
-                    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Remove links, keep text
-                    .trim();
-                  
-                  // Extract first letter for drop cap effect
-                  const firstLetter = plainText.charAt(0);
-                  const restOfParagraph = plainText.slice(1);
-                  
                   return (
                     <div className="mb-4 lg:mb-6">
-                      <p className="text-base lg:text-lg leading-relaxed text-[#1E3A5F] font-sans">
-                        <span className="text-3xl lg:text-4xl xl:text-5xl font-serif text-[#1E3A5F] float-left mr-2 leading-none">{firstLetter}</span>
-                        {restOfParagraph}
-                      </p>
+                      <MarkdownContent
+                        content={firstParagraph}
+                        dropCap
+                        className="text-base lg:text-lg leading-relaxed text-[#1E3A5F] font-sans"
+                      />
                     </div>
                   );
                 }
@@ -238,9 +228,9 @@ export default function AboutPage() {
               const { rest } = getContentParts(aboutData.content);
               if (rest) {
                 return (
-                  <div 
-                    className="text-base lg:text-lg leading-relaxed text-[#1E3A5F] font-sans prose prose-lg max-w-none"
-                    dangerouslySetInnerHTML={{ __html: markdownToHtml(rest) }}
+                  <MarkdownContent
+                    content={rest}
+                    className="text-base lg:text-lg leading-relaxed text-[#1E3A5F] font-sans"
                   />
                 );
               }

@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { gsap } from 'gsap';
 import { ArrowUpRight, Loader2 } from 'lucide-react';
+import { renderContentPlainText } from '@/lib/utils/markdown';
 import type { News } from '@/lib/db/schema';
 
 interface NewsItem extends Omit<News, 'date'> {
@@ -46,7 +47,9 @@ function NewsPageContent() {
       const transformedData: NewsItem[] = data.map((item: News) => ({
         ...item,
         imageURL: item.imageUrl || '/images/banner.jpg',
-        excerpt: item.content ? item.content.replace(/<[^>]*>/g, '').substring(0, 150) + '...' : undefined,
+        excerpt: item.content
+          ? renderContentPlainText(item.content).substring(0, 150) + '...'
+          : undefined,
         date: new Date(item.date).toLocaleDateString('tr-TR', {
           day: 'numeric',
           month: 'long',
